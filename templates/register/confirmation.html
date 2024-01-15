@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Confirmation</title>
+    <!-- Add Bootstrap CSS link -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .response-message {
+            text-align: center;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .user-details {
+            margin-top: 20px;
+        }
+        .user-detail {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Registration Confirmation</h1>
+        <div class="response-message">
+            <p>Registration successful</p>
+        </div>
+        <div class="user-details">
+            <h3>User Details:</h3>
+            <div class="user-detail">
+                <strong>Account Holder Name:</strong> {{ username }}
+            </div>
+            <div class="user-detail">
+                <strong>Account email:</strong> {{ email }}
+            </div>
+            <div class="user-detail">
+                <strong>Password</strong> {{ password }}
+            </div>
+            <p class="mt-3"> <a href="/">Login</a></p>
+        </div>
+    </div>
+
+    <!-- Add Bootstrap JS and jQuery if needed -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
