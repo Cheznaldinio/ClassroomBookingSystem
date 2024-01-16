@@ -10,7 +10,7 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
 # Configure your PostgreSQL database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost/ClassroomBookingSystem'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgresql@localhost/ClassroomBookingSystem'
 db = SQLAlchemy(app)
 print("Hello world")
 
@@ -40,7 +40,7 @@ def capitalize_first_and_last(string):
     return ""
 
 class Users(db.Model):
-    userid = db.Column(db.String(255), primary_key=True)
+    userid = db.Column(db.String(255), primary_key=True, nullable=True, server_default=db.text('NULL::character varying'))
     username = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255))
     password = db.Column(db.String(255))
@@ -90,19 +90,16 @@ def register():
             print("email:",email)
             password = request.form['password']
             print("password:",password)
-            userid = capitalize_first_and_last(username) + str(random.randint(1000,9999))
             if not username and not email and not password:
                 print("Form returned nothing")
                 num = str(random.randint(0,222))
                 username = "DefaultUser" + num
                 email = "DefaultUser" + num + "@gmail.com"
                 password = "DefaultUserpswrd" + num
-                userid = "DU" + str(random.randint(1000,9999))
 
             # Process the form data as needed
             # Create a new User instance and add it to the database
             new_user = Users(
-                userid=userid,
                 username=username,
                 email=email,  # Assuming Email is used as an example for account_user_name
                 password=password,
