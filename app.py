@@ -90,7 +90,7 @@ def register():
             print("email:",email)
             password = request.form['password']
             print("password:",password)
-            if not username and not email and not password:
+            if not username or not email or not password:
                 print("Form returned nothing")
                 num = str(random.randint(0,222))
                 username = "DefaultUser" + num
@@ -105,6 +105,7 @@ def register():
                 password=password,
                 admin=False,
             )
+
             print(new_user)
             db.session.add(new_user)
             db.session.commit()
@@ -112,8 +113,11 @@ def register():
             # Log the new user information
             app.logger.info(f"New User: {str(new_user)}")
 
-            # Redirect to the /confirmation route with data as query parameters
-            return redirect(url_for('confirmation', user_id=new_user.userid))
+            # set the session id so the confirmation screen can use it
+            session['user_id'] = new_user.userid
+
+            # Redirect to the /confirmation route
+            return redirect(url_for('confirmation'))
 
         except Exception as e:
             error_message = {"error": str(e)}

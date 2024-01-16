@@ -35,5 +35,48 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.querySelector("form");
+
+            form.addEventListener("submit", function (event) {
+                let isValid = true;
+
+                // Check if the Account Holder Name is empty
+                const usernameInput = document.getElementById("username");
+                if (usernameInput.value.trim() === "") {
+                    usernameInput.classList.add("is-invalid");
+                    isValid = false;
+                } else {
+                    usernameInput.classList.remove("is-invalid");
+                }
+
+                // Check if the Email is empty and has a valid format
+                const emailInput = document.getElementById("email");
+                const emailValue = emailInput.value.trim();
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (emailValue === "" || !emailRegex.test(emailValue)) {
+                    emailInput.classList.add("is-invalid");
+                    isValid = false;
+                } else {
+                    emailInput.classList.remove("is-invalid");
+                }
+
+                // Check if the Password is empty
+                const passwordInput = document.getElementById("password");
+                if (passwordInput.value.trim() === "") {
+                    passwordInput.classList.add("is-invalid");
+                    isValid = false;
+                } else {
+                    passwordInput.classList.remove("is-invalid");
+                }
+
+                if (!isValid) {
+                    event.preventDefault(); // Prevent form submission if validation fails
+                }
+            });
+        });
+    </script>
 </body>
 </html>
