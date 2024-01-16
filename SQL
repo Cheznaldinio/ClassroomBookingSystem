@@ -1,0 +1,36 @@
+-- Create the User table
+CREATE TABLE users (
+    UserID VARCHAR(255) PRIMARY KEY,
+    UserName VARCHAR(255) NOT NULL,
+    Email VARCHAR(255),
+    Password VARCHAR(255),
+    Admin BOOLEAN
+);
+
+-- Create the Bookings table
+CREATE TABLE Bookings (
+    UserID VARCHAR(255),
+    Classroom VARCHAR(255),
+    Date INT,
+    StartTime INT,
+    EndTime INT,
+    FOREIGN KEY (UserID) REFERENCES users(UserID)
+);
+
+SELECT *
+FROM pg_settings
+WHERE name = 'port';
+
+select * from users;
+
+
+drop TABLE users;
+
+select * from Bookings;
+
+drop TABLE Bookings
+
+INSERT INTO users (UserID, UserName, Email, Password, Admin)
+VALUES ('CG0001', 'Chester Green', 'greenc@wellingtoncollege.org.uk', 'password1', true);
+INSERT INTO users (UserID, UserName, Email, Password, Admin)
+VALUES ('AW0002', 'Alfred Watson', 'watsona@wellingtoncollege.org.uk', 'password2', true);
