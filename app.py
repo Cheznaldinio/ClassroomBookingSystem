@@ -29,9 +29,12 @@ def capitalize_first_and_last(string):
 
         # Capitalize the first letter of the last word
         last_word = words[-1].capitalize()
-
+        first_letter = first_word[0]
+        last_letter = last_word[0]
         # Return the modified string
-        return f"{first_word} {last_word}"
+        print(first_letter)
+        print(last_letter)
+        return f"{first_word}{last_word}"
 
     # If the string is empty, return an empty string
     return ""
@@ -81,29 +84,31 @@ def register():
             logging.info("Register Point2")
             # Retrieve form data using request.json for JSON data or request.form for form data
 
-            username = request.args.get('username')
-            email = request.args.get('email')
-            password = request.args.get('password')
+            username = request.form['username']
+            print("username:",username)
+            email = request.form['email']
+            print("email:",email)
+            password = request.form['password']
+            print("password:",password)
             userid = capitalize_first_and_last(username) + str(random.randint(1000,9999))
-            if not username:
+            if not username and not email and not password:
+                print("Form returned nothing")
                 num = str(random.randint(0,222))
                 username = "DefaultUser" + num
                 email = "DefaultUser" + num + "@gmail.com"
                 password = "DefaultUserpswrd" + num
                 userid = "DU" + str(random.randint(1000,9999))
 
-
-
             # Process the form data as needed
             # Create a new User instance and add it to the database
             new_user = Users(
+                userid=userid,
                 username=username,
                 email=email,  # Assuming Email is used as an example for account_user_name
                 password=password,
-                userid=userid,
                 admin=False,
             )
-
+            print(new_user)
             db.session.add(new_user)
             db.session.commit()
 
