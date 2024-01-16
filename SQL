@@ -1,10 +1,12 @@
 -- Create the User table
-CREATE TABLE users (
-    UserID VARCHAR(255) PRIMARY KEY,
-    UserName VARCHAR(255) NOT NULL,
-    Email VARCHAR(255),
-    Password VARCHAR(255),
-    Admin BOOLEAN
+CREATE SEQUENCE user_id_sequence START 1;
+
+CREATE TABLE Users (
+    userid integer PRIMARY KEY DEFAULT nextval('user_id_sequence'),
+    username VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
+    password VARCHAR(255),
+    admin BOOLEAN DEFAULT FALSE
 );
 
 -- Create the Bookings table
@@ -30,7 +32,7 @@ select * from Bookings;
 
 drop TABLE Bookings
 
-INSERT INTO users (UserID, UserName, Email, Password, Admin)
-VALUES ('CG0001', 'Chester Green', 'greenc@wellingtoncollege.org.uk', 'password1', true);
-INSERT INTO users (UserID, UserName, Email, Password, Admin)
-VALUES ('AW0002', 'Alfred Watson', 'watsona@wellingtoncollege.org.uk', 'password2', true);
+INSERT INTO users (UserName, Email, Password, Admin)
+VALUES ('Chester Green', 'greenc@wellingtoncollege.org.uk', 'password1', true);
+INSERT INTO users (UserName, Email, Password, Admin)
+VALUES ('Alfred Watson', 'watsona@wellingtoncollege.org.uk', 'password2', true);
