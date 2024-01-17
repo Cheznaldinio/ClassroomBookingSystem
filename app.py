@@ -1,16 +1,19 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session
 import logging
 import random
+from config import Config
 from flask_sqlalchemy import SQLAlchemy
 
 # Configure basic logging to print messages to the console
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 app = Flask(__name__)
+app.config.from_object(Config)
 app.secret_key = 'your_secret_key'
 
 # Configure your PostgreSQL database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgresql@localhost/ClassroomBookingSystem'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgresql@localhost/ClassroomBookingSystem'
+
 db = SQLAlchemy(app)
 print("Hello world")
 
