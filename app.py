@@ -70,6 +70,10 @@ def confirmation():
     redirect_url = request.args.get('redirect_url')
     user = Users.query.filter_by(userid=user_id).first()
 
+
+    #delete the user_id from the session to ensure that the user logs in afterwards
+    session.pop('user_id', None)
+
     return render_template('/register/confirmation.html',
                            username=user.username,
                            email=user.email,
@@ -160,7 +164,16 @@ def login():
 @app.route('/home', methods=['GET'])
 def home():
     logging.info("Home Point")
+
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+
     user_id = session['user_id']
+
+    user = Users.query.filter_by(userid=user_id).first()
+    if user is None:
+        return redirect(url_for('index'))
+
     logging.info(user_id)
     return render_template('/home.html')
 
