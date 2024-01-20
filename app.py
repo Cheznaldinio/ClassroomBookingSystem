@@ -180,5 +180,35 @@ def home():
     logging.info(user_id)
     return render_template('/home.html')
 
+@app.route('/createbooking', methods=['GET'])
+def createbooking():
+    logging.info("Create Booking Point")
+
+    return render_template('/booking.html')
+@app.route('/book', methods=['POST'])
+def book():
+    logging.info("Booking Point")
+    if request.method == 'POST':
+        try:
+            logging.info("Booking Point2")
+            # Retrieve form data using request.json for JSON data or request.form for form data
+
+            date = request.form['date']
+            print("Date:",date)
+            start_time = request.form['start_time']
+            print("Time:",start_time)
+            duration = request.form['duration']
+            print("Duration:",duration)
+            room = request.form['room']
+            print("Room:",room)
+
+        except Exception as e:
+            error_message = {"error": str(e)}
+            return jsonify(error_message), 400  # Respond with an error message if there's an issue
+
+    # Add an additional response if the request method is not 'POST'
+    return jsonify({"error": "Invalid request method"}), 405
+
+
 if __name__ == '__main__':
     app.run()
