@@ -2,20 +2,20 @@ from flask import Flask, request, jsonify, render_template, redirect, url_for, s
 import logging
 import random
 from config import Config
-from flask_sqlalchemy import SQLAlchemy
+from database import db
+from users import Users
 
 # Configure basic logging to print messages to the console
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+#set up the flask app and the database
 app = Flask(__name__)
 app.config.from_object(Config)
 app.secret_key = 'your_secret_key'
+db.init_app(app)
 
 # Configure your PostgreSQL database
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgresql@localhost/ClassroomBookingSystem'
-
-db = SQLAlchemy(app)
-print("Hello world")
 
 
 def capitalize_first_and_last(string):
@@ -41,16 +41,6 @@ def capitalize_first_and_last(string):
 
     # If the string is empty, return an empty string
     return ""
-
-class Users(db.Model):
-    userid = db.Column(db.String(255), primary_key=True, nullable=True, server_default=db.text('NULL::character varying'))
-    username = db.Column(db.String(255), nullable=False)
-    email = db.Column(db.String(255))
-    password = db.Column(db.String(255))
-    admin = db.Column(db.Boolean, default=False)
-
-    def __str__(self):
-        return f"User: {self.userid}, {self.username}, {self.email}, {self.password}, {self.admin}"
 
 
 @app.route('/', methods=['GET'])
@@ -148,7 +138,8 @@ def login():
 
             # Check if the user exists and the password is correct
             if user and user.password == account_password:
-                # Redirect to the home page if credentials are correct
+      #
+      # Redirect to the home page if credentials are correct
                 logging.info("Logged in")
                 session['user_id'] = user.userid
                 return redirect(url_for('home'))
@@ -172,7 +163,6 @@ def home():
         return redirect(url_for('index'))
 
     user_id = session['user_id']
-
     user = Users.query.filter_by(userid=user_id).first()
     if user is None:
         return redirect(url_for('index'))
