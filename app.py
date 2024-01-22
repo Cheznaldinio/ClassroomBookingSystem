@@ -4,6 +4,8 @@ import random
 from config import Config
 from database import db
 from users import Users
+from bookings import Bookings
+from datetime import datetime, timedelta
 
 # Configure basic logging to print messages to the console
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -178,27 +180,70 @@ def createbooking():
 @app.route('/book', methods=['POST'])
 def book():
     logging.info("Booking Point")
-    if request.method == 'POST':
-        try:
-            logging.info("Booking Point2")
-            # Retrieve form data using request.json for JSON data or request.form for form data
 
-            date = request.form['date']
-            print("Date:",date)
-            start_time = request.form['start_time']
-            print("Time:",start_time)
-            duration = request.form['duration']
-            print("Duration:",duration)
-            room = request.form['room']
-            print("Room:",room)
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+
+    user_id = session['user_id']
+    user = Users.query.filter_by(userid=user_id).first()
+    if user is None:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        # Extract data from form
+
+        classroom = request.form['room']
+        title = request.form['title']
+        date = datetime.strptime(request.form['date'], '%m/%d/%Y')
+        start_time_str = request.form['start_time']
+        duration = float(request.form['duration'])
+
+        # Combine date and start time
+        start_time = datetime.combine(date, datetime.strptime(start_time_str, '%H:%M').time())
+        end_time = start_time + timedelta(hours=duration)
+
+        logging.info("Creating Booking Object")
+
+        try:
+            # Create booking object
+            booking = Bookings(
+                user_id=user_id,
+                classroom=classroom,
+                title=title,
+                date=date,
+                start_time=start_time,
+                end_time=end_time,
+                status='Pending'  # Default status, adjust as needed
+            )
+
+            # Add booking to the database
+            db.session.add(booking)
+            db.session.commit()
 
         except Exception as e:
             error_message = {"error": str(e)}
             return jsonify(error_message), 400  # Respond with an error message if there's an issue
 
-    # Add an additional response if the request method is not 'POST'
-    return jsonify({"error": "Invalid request method"}), 405
+        # Redirect or return a response
+        return redirect(url_for('mybookings'))  # Redirect to a success page, or handle as needed
 
+    return 'Invalid Method', 405
+
+
+@app.route('/mybookings', methods=['GET'])
+def mybookings():
+
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+
+    user_id = session['user_id']
+    user = Users.query.filter_by(userid=user_id).first()
+    if user is None:
+        return redirect(url_for('index'))
+
+    # Query the database for bookings by the user
+    bookings = Bookings.query.filter_by(user_id=user_id).all()
+    return render_template('mybookings.html', bookings=bookings)
 
 if __name__ == '__main__':
     app.run()

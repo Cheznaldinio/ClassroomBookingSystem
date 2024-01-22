@@ -14,6 +14,21 @@
     <div class="container mt-5">
         <h1 class="mb-4">Booking Form</h1>
         <form action="/book" method="POST">
+
+            <div class="form-group">
+                <label for="title">Booking Title:</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+
+            <div class="form-group">
+                <label for="classroom">Select Classroom:</label>
+                <select class="form-control" id="room" name="room" required>
+                    <option value="1">C-S 1</option>
+                    <option value="2">C-S 2</option>
+                    <option value="3">C-S 3</option>
+                </select>
+            </div>
+
             <div class="form-group">
                 <label for="date">Date:</label>
                 <input type="text" class="form-control datepicker" id="date" name="date" required>
@@ -47,14 +62,7 @@
                 <input type="number" class="form-control" id="duration" name="duration" step="0.5" min="0" required>
             </div>
 
-            <div class="form-group">
-                <label for="classroom">Classroom:</label>
-                <select class="form-control" id="room" name="room" required>
-                    <option value="1">C-S 1</option>
-                    <option value="2">C-S 2</option>
-                    <option value="3">C-S 3</option>
-                </select>
-            </div>
+
 
             <button type="submit" class="btn btn-primary">Book Now</button>
         </form>

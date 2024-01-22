@@ -10,14 +10,19 @@ CREATE TABLE Users (
 );
 
 -- Create the Bookings table
-CREATE TABLE Bookings (
-    UserID VARCHAR(255),
-    Classroom VARCHAR(255),
-    Date INT,
-    StartTime INT,
-    EndTime INT,
-    FOREIGN KEY (UserID) REFERENCES users(UserID)
+CREATE TABLE bookings (
+    booking_id SERIAL PRIMARY KEY,
+    user_id integer REFERENCES users(userid),
+    classroom VARCHAR(255),
+    title VARCHAR(255),
+    date TIMESTAMP,
+    start_time TIMESTAMP,
+    end_time TIMESTAMP,
+    status VARCHAR(50),
+    created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    cancelled_on TIMESTAMP
 );
+
 
 SELECT *
 FROM pg_settings

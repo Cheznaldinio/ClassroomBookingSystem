@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Bookings</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>My Bookings</h1>
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">Title</th>
+                    <th onclick="sortTable(1)">Classroom</th>
+                    <th onclick="sortTable(2)">Date</th>
+                    <th onclick="sortTable(3)">Start Time</th>
+                    <th onclick="sortTable(4)">End Time</th>
+                    <th onclick="sortTable(5)">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.title }}</td>
+                        <td>{{ booking.classroom }}</td>
+                        <td>{{ booking.date.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ booking.start_time.strftime('%H:%M') }}</td>
+                        <td>{{ booking.end_time.strftime('%H:%M') }}</td>
+                        <td>{{ booking.status }}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="6">No bookings found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Sorting Script -->
+    <script>
+        function sortTable(n) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.getElementsByTagName("table")[0];
+            switching = true;
+            // Set the sorting direction to ascending:
+            dir = "asc";
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+                    if (dir == "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount ++;
+                } else {
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
