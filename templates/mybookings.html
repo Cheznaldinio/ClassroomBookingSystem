@@ -84,8 +84,21 @@
     <!-- Initialize FullCalendar -->
     <script>
         $(document).ready(function() {
+
+             var bookingDates = new Set();
+
+            {% for booking in bookings %}
+                bookingDates.add('{{ booking.date.strftime('%Y-%m-%d') }}');
+            {% endfor %}
+
+
             $('#calendar').fullCalendar({
                 // ... (other options)
+                dayRender: function(date, cell) {
+                    if (bookingDates.has(date.format('YYYY-MM-DD'))) {
+                        cell.css("background-color", "#ffcccc"); // Highlight the day cell
+                    }
+                },
                 dayClick: function(date, jsEvent, view) {
                     // Handle day click event
                     updateTimetable(date);
