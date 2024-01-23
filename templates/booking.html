@@ -87,6 +87,11 @@
         // No need to initialize Timepicker separately since it's not used in the dropdown
 
     </script>
+    <script>
+        {% if error_message %}
+            alert("{{ error_message }}");
+        {% endif %}
+    </script>
 </body>
 </html>
 

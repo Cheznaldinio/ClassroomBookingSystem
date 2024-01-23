@@ -6,6 +6,7 @@ from database import db
 from users import Users
 from bookings import Bookings
 from datetime import datetime, timedelta
+from sqlalchemy import or_, and_
 
 # Configure basic logging to print messages to the console
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -177,6 +178,8 @@ def createbooking():
     logging.info("Create Booking Point")
 
     return render_template('/booking.html')
+from sqlalchemy import and_
+
 @app.route('/book', methods=['POST'])
 def book():
     logging.info("Booking Point")
@@ -190,19 +193,33 @@ def book():
         return redirect(url_for('index'))
 
     if request.method == 'POST':
-        # Extract data from form
-
         classroom = request.form['room']
         title = request.form['title']
         date = datetime.strptime(request.form['date'], '%m/%d/%Y')
         start_time_str = request.form['start_time']
         duration = float(request.form['duration'])
 
-        # Combine date and start time
         start_time = datetime.combine(date, datetime.strptime(start_time_str, '%H:%M').time())
         end_time = start_time + timedelta(hours=duration)
 
         logging.info("Creating Booking Object")
+
+        # Check for overlapping bookings in the same classroom
+        overlapping_booking = Bookings.query.filter(
+            and_(
+                Bookings.classroom == classroom,
+                or_(
+                    and_(Bookings.start_time <= start_time, Bookings.end_time >= start_time),
+                    and_(Bookings.start_time <= end_time, Bookings.end_time >= end_time),
+                    and_(Bookings.start_time >= start_time, Bookings.end_time <= end_time)
+                )
+            )
+        ).first()
+
+        if overlapping_booking:
+            # Classroom is already booked during this time
+            error_message = "Classroom is already booked during this time by another event."
+            return render_template('booking.html', error_message=error_message)
 
         try:
             # Create booking object
@@ -213,7 +230,7 @@ def book():
                 date=date,
                 start_time=start_time,
                 end_time=end_time,
-                status='Pending'  # Default status, adjust as needed
+                status='Pending'
             )
 
             # Add booking to the database
@@ -222,12 +239,12 @@ def book():
 
         except Exception as e:
             error_message = {"error": str(e)}
-            return jsonify(error_message), 400  # Respond with an error message if there's an issue
+            return jsonify(error_message), 400
 
-        # Redirect or return a response
-        return redirect(url_for('mybookings'))  # Redirect to a success page, or handle as needed
+        return redirect(url_for('mybookings'))
 
     return 'Invalid Method', 405
+
 
 
 @app.route('/mybookings', methods=['GET'])

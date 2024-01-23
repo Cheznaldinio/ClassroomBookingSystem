@@ -5,46 +5,47 @@
     <title>My Bookings</title>
     <!-- Bootstrap CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FullCalendar CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container mt-5">
-        <h1>My Bookings</h1>
-        <table class="table table-bordered table-hover">
-            <thead>
-                <tr>
-                    <th onclick="sortTable(0)">Title</th>
-                    <th onclick="sortTable(1)">Classroom</th>
-                    <th onclick="sortTable(2)">Date</th>
-                    <th onclick="sortTable(3)">Start Time</th>
-                    <th onclick="sortTable(4)">End Time</th>
-                    <th onclick="sortTable(5)">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for booking in bookings %}
-                    <tr>
-                        <td>{{ booking.title }}</td>
-                        <td>{{ booking.classroom }}</td>
-                        <td>{{ booking.date.strftime('%Y-%m-%d') }}</td>
-                        <td>{{ booking.start_time.strftime('%H:%M') }}</td>
-                        <td>{{ booking.end_time.strftime('%H:%M') }}</td>
-                        <td>{{ booking.status }}</td>
-                    </tr>
-                {% else %}
-                    <tr><td colspan="6">No bookings found.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="row">
+            <!-- Calendar View -->
+            <div class="col-md-6">
+                <div id="calendar"></div>
+            </div>
+            <!-- Table View -->
+            <div class="col-md-6">
+                <h2 id="selectedDayHeader">Timetable</h2>
+                <table id="timetable" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Classroom</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
     </div>
+
     <!-- Bootstrap JS and jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- FullCalendar JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
     <!-- Sorting Script -->
     <script>
         function sortTable(n) {
             var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-            table = document.getElementsByTagName("table")[0];
+            table = document.getElementById("timetable");
             switching = true;
             // Set the sorting direction to ascending:
             dir = "asc";
@@ -70,7 +71,7 @@
                 if (shouldSwitch) {
                     rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
                     switching = true;
-                    switchcount ++;
+                    switchcount++;
                 } else {
                     if (switchcount == 0 && dir == "asc") {
                         dir = "desc";
@@ -79,6 +80,53 @@
                 }
             }
         }
+    </script>
+    <!-- Initialize FullCalendar -->
+    <script>
+        $(document).ready(function() {
+            $('#calendar').fullCalendar({
+                // ... (other options)
+                dayClick: function(date, jsEvent, view) {
+                    // Handle day click event
+                    updateTimetable(date);
+                },
+                eventClick: function(event, jsEvent, view) {
+                    // Handle event click event
+                    updateTimetable(event.start);
+                }
+            });
+
+            function updateTimetable(date) {
+                var formattedDate = moment(date).format('YYYY-MM-DD');
+                $('#selectedDayHeader').text('Timetable for ' + formattedDate);
+
+                // Clear existing timetable content
+                $('#timetable tbody').empty();
+
+                // Fetch and display bookings for the selected day
+                {% for booking in bookings %}
+                    if ('{{ booking.date.strftime('%Y-%m-%d') }}' === formattedDate) {
+                        $('#timetable tbody').append(`
+                            <tr>
+                                <td>{{ booking.title }}</td>
+                                <td>{{ booking.classroom }}</td>
+                                <td>{{ booking.start_time.strftime('%H:%M') }}</td>
+                                <td>{{ booking.end_time.strftime('%H:%M') }}</td>
+                                <td>{{ booking.status }}</td>
+                            </tr>
+                        `);
+                    }
+                {% endfor %}
+
+                // If no bookings found, display a message
+                if ($('#timetable tbody').is(':empty')) {
+                    $('#timetable tbody').append('<tr><td colspan="5">No bookings for this day.</td></tr>');
+                }
+
+                // Sort the timetable by the first column (you can change the column index if needed)
+                sortTable(0);
+            }
+        });
     </script>
 </body>
 </html>
