@@ -1,0 +1,22 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancel Bookings</title>
+    <!-- Add Bootstrap CSS link -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+        <h1 class="mb-4">Registration</h1>
+        <form action="/cancel" method="POST">
+            <div class="form-group">
+                <label for="booking">Cancel Bookings:</label>
+                <input type="number" class="form-control" id="booking" name="booking" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Cancel</button>
+        </form>
+</div>
+</body>
+</html>

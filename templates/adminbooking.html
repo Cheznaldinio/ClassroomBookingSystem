@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Bookings</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FullCalendar CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <!-- Calendar View -->
+            <div class="col-md-6">
+                <div id="calendar"></div>
+            </div>
+            <!-- Table View -->
+            <div class="col-md-6">
+                <h2 id="selectedDayHeader">Timetable</h2>
+                <table id="timetable" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Classroom</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Status</th>
+                            <th>User</th>
+                            <th>Booking Id</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <div>
+        <p class="mt-3">cancel booking<a href="/cancelbookings">Cancel</a></p>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- FullCalendar JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+    <!-- Sorting Script -->
+    <script>
+        function sortTable(n) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.getElementById("timetable");
+            switching = true;
+            // Set the sorting direction to ascending:
+            dir = "asc";
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+                    if (dir == "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++;
+                } else {
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Initialize FullCalendar -->
+    <script>
+        $(document).ready(function() {
+
+             var bookingDates = new Set();
+
+            {% for booking in bookings %}
+                bookingDates.add('{{ booking.date.strftime('%Y-%m-%d') }}');
+            {% endfor %}
+
+
+            $('#calendar').fullCalendar({
+                // ... (other options)
+                dayRender: function(date, cell) {
+                    if (bookingDates.has(date.format('YYYY-MM-DD'))) {
+                        cell.css("background-color", "#ffcccc"); // Highlight the day cell
+                    }
+                },
+                dayClick: function(date, jsEvent, view) {
+                    // Handle day click event
+                    updateTimetable(date);
+                },
+                eventClick: function(event, jsEvent, view) {
+                    // Handle event click event
+                    updateTimetable(event.start);
+                }
+            });
+
+            function updateTimetable(date) {
+                var formattedDate = moment(date).format('YYYY-MM-DD');
+                $('#selectedDayHeader').text('Timetable for ' + formattedDate);
+
+                // Clear existing timetable content
+                $('#timetable tbody').empty();
+
+                // Fetch and display bookings for the selected day
+                {% for booking in bookings %}
+                    if ('{{ booking.date.strftime('%Y-%m-%d') }}' === formattedDate) {
+                        $('#timetable tbody').append(`
+                            <tr>
+                                <td>{{ booking.title }}</td>
+                                <td>{{ booking.classroom }}</td>
+                                <td>{{ booking.start_time.strftime('%H:%M') }}</td>
+                                <td>{{ booking.end_time.strftime('%H:%M') }}</td>
+                                <td>{{ booking.status }}</td>
+                                <td>{{ booking.user }}</td>
+                                <td>{{ booking.booking_id }}</td>
+                            </tr>
+                        `);
+                    }
+                {% endfor %}
+
+                // If no bookings found, display a message
+                if ($('#timetable tbody').is(':empty')) {
+                    $('#timetable tbody').append('<tr><td colspan="5">No bookings for this day.</td></tr>');
+                }
+
+                // Sort the timetable by the first column (you can change the column index if needed)
+                sortTable(0);
+            }
+        });
+    </script>
+</body>
+</html>

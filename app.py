@@ -167,11 +167,20 @@ def home():
 
     user_id = session['user_id']
     user = Users.query.filter_by(userid=user_id).first()
+    admin = user.admin
     if user is None:
         return redirect(url_for('index'))
 
     logging.info(user_id)
-    return render_template('/home.html')
+    if admin:
+        print("Admin looging")
+        return render_template('/adminhome.html',
+                               username=user.username,
+                               admin=user.admin)
+    else:
+        return render_template('/home.html',
+                                username=user.username,
+                                admin=user.admin)
 
 @app.route('/createbooking', methods=['GET'])
 def createbooking():
@@ -245,8 +254,6 @@ def book():
 
     return 'Invalid Method', 405
 
-
-
 @app.route('/mybookings', methods=['GET'])
 def mybookings():
 
@@ -261,6 +268,63 @@ def mybookings():
     # Query the database for bookings by the user
     bookings = Bookings.query.filter_by(user_id=user_id).all()
     return render_template('mybookings.html', bookings=bookings)
+
+@app.route('/adminbooking', methods=['GET'])
+def adminbooking():
+
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+
+    user_id = session['user_id']
+    user = Users.query.filter_by(userid=user_id).first()
+    if user is None:
+        return redirect(url_for('index'))
+
+    # Query the database for bookings by the user
+    bookings = Bookings.query.all()
+
+    return render_template('adminbooking.html', bookings=bookings)
+
+@app.route('/cancelbookings', methods=['GET'])
+def cancelbookings():
+
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+
+    user_id = session['user_id']
+    user = Users.query.filter_by(userid=user_id).first()
+    if user is None:
+        return redirect(url_for('index'))
+
+    # Query the database for bookings by the user
+    bookings = Bookings.query.all()
+
+    return render_template('cancelbookings.html',
+                           bookings=bookings)
+
+@app.route('/cancel', methods=['POST'])
+def cancel():
+    logging.info("Cancel Point")
+    if request.method == 'POST':
+        try:
+            logging.info("Cancel Point2")
+            # Retrieve form data using request.json for JSON data or request.form for form data
+
+            cancelbooking = request.form['booking']
+            booking_to_cancel = Bookings.query.get(cancelbooking)
+            db.session.delete(booking_to_cancel)
+            db.session.commit()
+            logging.info("Booking cancelled",cancelbooking)
+            # Redirect to the /confirmation route
+            return redirect(url_for('adminbooking'))
+
+        except Exception as e:
+            error_message = {"error": str(e)}
+            return jsonify(error_message), 400  # Respond with an error message if there's an issue
+
+    # Add an additional response if the request method is not 'POST'
+    return jsonify({"error": "Invalid request method"}), 405
+
 
 if __name__ == '__main__':
     app.run()
